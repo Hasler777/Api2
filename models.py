@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
 
 
-# --- Задание 3.1 ---
+
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
@@ -19,13 +19,13 @@ class UserCreate(BaseModel):
         return v
 
 
-# --- Задание 5.1 / 5.2 / 5.3 ---
+
 class LoginData(BaseModel):
     username: str
     password: str
 
 
-# --- Задание 5.5 ---
+
 class CommonHeaders(BaseModel):
     user_agent: str
     accept_language: str
