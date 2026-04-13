@@ -14,11 +14,7 @@ app = FastAPI()
 
 SECRET_KEY = "supersecretkey_krutov_2026"
 
-# =====================================================
-# Fake data
-# =====================================================
 
-# Пользователи для авторизации (задания 5.1–5.3)
 fake_users = {
     "user123": {
         "username": "user123",
@@ -29,10 +25,10 @@ fake_users = {
     }
 }
 
-# Простое хранилище сессий (задание 5.1)
+
 sessions: dict = {}
 
-# Товары (задание 3.2)
+
 sample_product_1 = {
     "product_id": 123,
     "name": "Smartphone",
@@ -73,9 +69,7 @@ sample_products = [
 ]
 
 
-# =====================================================
-# Helpers: подпись cookie (задания 5.2, 5.3)
-# =====================================================
+
 
 def _sign(data: str) -> str:
     return hmac.new(
@@ -111,19 +105,13 @@ def _find_user_by_id(user_id: str) -> Optional[dict]:
     return None
 
 
-# =====================================================
-# Задание 3.1 — POST /create_user
-# =====================================================
 
 @app.post("/create_user")
 def create_user(user: UserCreate):
     return user.model_dump()
 
 
-# =====================================================
-# Задание 3.2 — GET /product/{product_id}
-#              — GET /products/search
-# =====================================================
+
 
 @app.get("/product/{product_id}")
 def get_product(product_id: int):
@@ -147,10 +135,7 @@ def search_products(
     return results[:limit]
 
 
-# =====================================================
-# Задание 5.1 — POST /login  +  GET /user
-# (базовая cookie-аутентификация)
-# =====================================================
+
 
 @app.post("/login")
 def login(data: LoginData, response: Response):
@@ -158,7 +143,7 @@ def login(data: LoginData, response: Response):
     if not user or user["password"] != data.password:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # 5.3: подписанный токен с timestamp
+   
     ts = time.time()
     signed_token = create_session_token(user["user_id"], ts)
 
@@ -180,7 +165,7 @@ def get_user(session_token: Optional[str] = Cookie(None)):
     if not session_token:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    # Пробуем простое хранилище
+  
     user = sessions.get(session_token)
     if user:
         return {"name": user["name"], "email": user["email"]}
@@ -195,10 +180,6 @@ def get_user(session_token: Optional[str] = Cookie(None)):
     raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-# =====================================================
-# Задание 5.2 + 5.3 — GET /profile
-# (подписанная cookie с динамическим временем жизни)
-# =====================================================
 
 @app.get("/profile")
 def get_profile(
@@ -224,8 +205,8 @@ def get_profile(
         response.status_code = 401
         return {"message": "Unauthorized"}
 
-    # 5.3: логика продления сессии
-    if elapsed > 300:  # > 5 мин — сессия истекла
+   
+    if elapsed > 300: 
         response.status_code = 401
         response.delete_cookie("session_token")
         return {"message": "Session expired"}
@@ -239,7 +220,7 @@ def get_profile(
             httponly=True,
             max_age=300,
         )
-    # < 3 мин — не обновляем
+   
 
     return {
         "user_id": user_id,
@@ -248,10 +229,6 @@ def get_profile(
     }
 
 
-# =====================================================
-# Задание 5.4 + 5.5 — GET /headers  +  GET /info
-# (CommonHeaders Pydantic-модель, X-Server-Time)
-# =====================================================
 
 @app.get("/headers")
 def get_headers(
